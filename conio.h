@@ -12,6 +12,7 @@ int printf( const char * format, ...);
 int getch(void);
 int getche(void);
 int getchar(void);
+extern "C" size_t read_stdin(char* str, size_t n);
 char* gets_s(char* str, size_t n);
 char* gets(char* str);
 int vscanf(const char *format, va_list args);

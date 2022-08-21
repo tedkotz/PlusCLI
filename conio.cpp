@@ -2,7 +2,7 @@
 #include "conio.h"
 #include <Arduino.h>
 
-#define MAX_IO_BUFFER 256
+#define SCAN_BUFFER_SIZE 256
 
 
 extern "C" int putchar( int  c)
@@ -84,6 +84,7 @@ extern "C" int getche(void)
       putchar((char)c);
       putchar(' ');
       putchar((char)c);
+      break;
 
     default:
       putchar((char)c);
@@ -97,10 +98,10 @@ extern "C" int getchar(void)
   return getche();
 }
 
-extern "C" char* gets_s(char* str, size_t n)
+extern "C" size_t read_stdin(char* str, size_t n)
 {
   int numRead=0;
-  for( numRead=0; numRead < n; numRead++)
+  for( numRead=0; numRead <= n; numRead++)
   {
     int c=getche();
     
@@ -108,8 +109,7 @@ extern "C" char* gets_s(char* str, size_t n)
     {
       // Check for enter
       case '\n':
-        str[numRead]='\0';
-        return str;
+        return numRead;
 
       // Check for backspace or delete
       case '\b':
@@ -123,19 +123,25 @@ extern "C" char* gets_s(char* str, size_t n)
     } 
   }
 
+  return numRead;
+}
+
+extern "C" char* gets_s(char* str, size_t n)
+{
+  int numRead=read_stdin(str, n-1);
   str[numRead]='\0';
   return str;
 }
 
 extern "C" char* gets(char* str)
 {
-  return gets_s( str, MAX_IO_BUFFER);
+  return gets_s( str, SIZE_MAX);
 }
 
 extern "C" int vscanf(const char *format, va_list args)
 {
-  char temp[MAX_IO_BUFFER];
-  gets_s(temp, MAX_IO_BUFFER);
+  char temp[SCAN_BUFFER_SIZE];
+  gets_s(temp, SCAN_BUFFER_SIZE);
   return vsscanf(temp, format, args);
 }
 
@@ -194,5 +200,5 @@ extern "C" void gotoxy(int x, int y)
 //  //scanf("\033[%d;%dR", y, x)
 //}
 
-// extern "C" int wherex(vodi);
+// extern "C" int wherex(void);
 // extern "C" int wherey(void);
