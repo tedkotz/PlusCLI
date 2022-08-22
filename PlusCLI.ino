@@ -1,8 +1,9 @@
 
 #include "CLI.h"
 #include "conio.h"
-#include <errno.h>
+#include "mineswp.h"
 #include <limits.h>
+
 
 #define MAX_IO_BUFFER 4096
 
@@ -69,6 +70,7 @@ const CLI_CommandEntry commandEntryTable[] =
   { "ECHO"    , echo  },
   { "BGCOLOR" , bgcolor },
   { "FGCOLOR" , fgcolor },
+  { "GAME"    , minesweep_main },
 };
 
 const char* getPrompt (void) 
