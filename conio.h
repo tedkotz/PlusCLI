@@ -30,4 +30,4 @@ void gotoxy(int x, int y);
 
 #ifdef  __cplusplus
 }
-#endif  
+#endif

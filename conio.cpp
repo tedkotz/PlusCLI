@@ -1,6 +1,8 @@
 
 #include "conio.h"
+
 #include <Arduino.h>
+#include <stdarg.h>
 
 #define SCAN_BUFFER_SIZE 256
 
