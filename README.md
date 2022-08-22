@@ -10,9 +10,9 @@ Improved serial console for Arduino, with a framework to register callback comma
 
 
 
-### TODO
+### Features/TODO
 - [ ] conio.h wrappers
 - [ ] Arg parsing
 - [ ] Automatically generated help
 - [ ] Add Doxygen comments to header
-- [ ] Split out callback framework
+- [x] Split out CLI callback framework
