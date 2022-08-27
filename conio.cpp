@@ -1,13 +1,12 @@
 
 #include "conio.h"
 
-#include <Arduino.h>
 #include <stdarg.h>
 
-#define SCAN_BUFFER_SIZE 256
+#define SCAN_BUFFER_SIZE 128
 
 
-extern "C" int putchar( int  c)
+extern "C" int CONIO_putchar( int  c)
 {
   if( c == '\n' )
   {
@@ -17,17 +16,17 @@ extern "C" int putchar( int  c)
   return c;
 }
 
-extern "C" int puts( const char * str)
+extern "C" int CONIO_puts( const char * str)
 {
-  int count=0;
-  while( *str != '\0' )
+  const char * ptr = str;
+  while( *ptr != '\0' )
   {
-    putchar(*str++);
+    putchar(*ptr++);
   }
-  return count;
+  return (ptr-str);
 }
 
-extern "C" int vprintf( const char * format, va_list args)
+extern "C" int CONIO_vprintf( const char * format, va_list args)
 {
   const unsigned trySize = 128;
   char tryBuf[trySize];
@@ -43,7 +42,7 @@ extern "C" int vprintf( const char * format, va_list args)
   return puts(tryBuf);
 }
 
-extern "C" int printf( const char * format, ...)
+extern "C" int CONIO_printf( const char * format, ...)
 {
   va_list arg_ptr;
 
@@ -95,7 +94,7 @@ extern "C" int getche(void)
   return c;
 }
 
-extern "C" int getchar(void)
+extern "C" int CONIO_getchar(void)
 {
   return getche();
 }
@@ -135,10 +134,18 @@ extern "C" char* gets_s(char* str, size_t n)
   return str;
 }
 
-extern "C" char* gets(char* str)
+extern "C" char* CONIO_gets(char* str)
 {
   return gets_s( str, SIZE_MAX);
 }
+
+#ifdef __AVR__
+// AVR compiler doesn't define vssscanf so we will make a very naive version that only supports 3 args
+static int vsscanf(const char *str, const char *format, va_list args)
+{
+  return sscanf(str, format, va_arg(args, void*), va_arg(args, void*), va_arg(args, void*));
+}
+#endif
 
 extern "C" int vscanf(const char *format, va_list args)
 {
@@ -148,7 +155,7 @@ extern "C" int vscanf(const char *format, va_list args)
 }
 
 
-extern "C" int scanf( const char * format, ...)
+extern "C" int CONIO_scanf( const char * format, ...)
 {
   va_list arg_ptr;
 

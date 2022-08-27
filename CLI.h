@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <errno.h>
 
 #ifdef __cplusplus

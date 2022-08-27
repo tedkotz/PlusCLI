@@ -1,22 +1,31 @@
 
+#include <Arduino.h>
 #include <stdio.h>
+
+#define putchar   CONIO_putchar
+#define puts      CONIO_puts
+#define vprintf   CONIO_vprintf
+#define printf    CONIO_printf
+#define getchar   CONIO_getchar
+#define gets      CONIO_gets
+#define scanf     CONIO_scanf
 
 #ifdef __cplusplus
 extern "C" {
-#endif  
+#endif
 
-int putchar( int  c);
-int puts( const char * str);
-int vprintf( const char * format, va_list args);
-int printf( const char * format, ...);
+int CONIO_putchar( int  c);
+int CONIO_puts( const char * str);
+int CONIO_vprintf( const char * format, va_list args);
+int CONIO_printf( const char * format, ...);
 int getch(void);
 int getche(void);
-int getchar(void);
+int CONIO_getchar(void);
 extern "C" size_t read_stdin(char* str, size_t n);
 char* gets_s(char* str, size_t n);
-char* gets(char* str);
+char* CONIO_gets(char* str);
 int vscanf(const char *format, va_list args);
-int scanf( const char * format, ...);
+int CONIO_scanf( const char * format, ...);
 void clrscr(void);
 void delline(void);
 void textcolor(int color);

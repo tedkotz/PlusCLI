@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "conio.h"
 
-#define MAX_IO_BUFFER 4096
+#define MAX_IO_BUFFER 128
 
 
 static int returnCode = 0;

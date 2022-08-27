@@ -1,15 +1,8 @@
-
+#include <Arduino.h>
 #include "CLI.h"
 #include "conio.h"
 #include "mineswp.h"
 #include <limits.h>
-
-
-#define MAX_IO_BUFFER 4096
-
-#define SUCCESS 0
-
-static int count = 0;
 
 
 int blink (int argc, char** argv)
@@ -64,18 +57,42 @@ int fgcolor (int argc, char** argv)
   return SUCCESS;
 }
 
+int seedrand (int argc, char** argv)
+{
+  if( argc < 2 )
+  {
+    randomSeed(analogRead(0));
+    
+  }
+  else
+  {
+    const char* ptr = argv[1];
+    unsigned long sum =0;
+    while (*ptr != '\0')
+    {
+      sum <<= 1;
+      sum += *ptr++;
+    }
+    printf("Checksum = %lX\n", sum);
+    randomSeed(sum);
+  }
+  return SUCCESS;
+}
+
 const CLI_CommandEntry commandEntryTable[] =
 {
-  { "BLINK"   , blink },
-  { "ECHO"    , echo  },
-  { "BGCOLOR" , bgcolor },
-  { "FGCOLOR" , fgcolor },
-  { "GAME"    , minesweep_main },
+  { "BLINK"   , blink           },
+  { "ECHO"    , echo            },
+  { "BGCOLOR" , bgcolor         },
+  { "FGCOLOR" , fgcolor         },
+  { "SEED"    , seedrand        },
+  { "GAME"    , minesweep_main  },
 };
 
 const char* getPrompt (void) 
 {
   static char prompt[32];
+  static int count = 0;
   snprintf(prompt, 31, "\n%d,%d> ", count++, CLI_getLastReturnCode() );
   return prompt;
 }
