@@ -86,6 +86,7 @@ void setup()
   // put your setup code here, to run once:
   Serial.begin(57600);
   Serial.setTimeout(LONG_MAX);
+  randomSeed(analogRead(0));
   pinMode(LED_BUILTIN, OUTPUT);
   CLI_registerCommandEntryTable( commandEntryTable, sizeof(commandEntryTable)/sizeof(commandEntryTable[0]));
   CLI_getPrompt = getPrompt;
