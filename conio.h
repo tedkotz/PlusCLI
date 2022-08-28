@@ -2,10 +2,12 @@
 #include <Arduino.h>
 #include <stdio.h>
 
+#undef putchar
 #define putchar   CONIO_putchar
 #define puts      CONIO_puts
 #define vprintf   CONIO_vprintf
 #define printf    CONIO_printf
+#undef getchar
 #define getchar   CONIO_getchar
 #define gets      CONIO_gets
 #define scanf     CONIO_scanf
@@ -21,7 +23,7 @@ int CONIO_printf( const char * format, ...);
 int getch(void);
 int getche(void);
 int CONIO_getchar(void);
-extern "C" size_t read_stdin(char* str, size_t n);
+size_t read_stdin(char* str, size_t n);
 char* gets_s(char* str, size_t n);
 char* CONIO_gets(char* str);
 int vscanf(const char *format, va_list args);

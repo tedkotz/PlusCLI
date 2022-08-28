@@ -13,7 +13,8 @@ static size_t commandEntryTableSize=0;
 
 static const char* DEFAULTgetPrompt (void)
 {
-  return "\n> ";
+  static const PROGMEM char defaultPrompt[] = "\n> ";
+  return defaultPrompt;
 }
 
 const char* (*CLI_getPrompt) (void) = DEFAULTgetPrompt;
@@ -45,34 +46,37 @@ static bool commandTest( const char* input, const char* testValue )
 
 static int evaluate ( char* out, size_t out_size, char* in )
 {
+  static const PROGMEM char DELIM[] = " \t\n\r";
   char* argv[16];
   int argc=0;
-  char* token=strtok(in, " \t\n\r");
+  char* token=strtok(in, DELIM);
 
   while( token != NULL )
   {
     if (argc >= 16)
     {
-      snprintf( out, out_size-1, "Syntax Error. Argument list too long.", argv[0]);
+      static const PROGMEM char E2BIG_MSG[] = "Syntax Error. Argument list(%d) too long.\n";
+      snprintf( out, out_size-1, E2BIG_MSG, argc);
       return -E2BIG;
     }
     argv[argc++]=token;
-    token=strtok(NULL, " \t\n\r");
+    token=strtok(NULL, DELIM);
   }
 
-  for( int i=0; i<commandEntryTableSize; ++i )
+  for( size_t i=0; i<commandEntryTableSize; ++i )
   {
     if ( commandTest( argv[0], commandEntryTable[i].command ) )
     {
       //return commandEntryTable[i].callBack(argc, argv, out, out_size);
-      snprintf( out, out_size-1, "\nDone.\n");
+      static const PROGMEM char DONE_MSG[] = "\nDone.\n";
+      snprintf( out, out_size-1, DONE_MSG);
       return commandEntryTable[i].callBack(argc, argv);
     }
   }
 
   if ( commandTest( argv[0], "HELP" ) )
   {
-    for( int i=0; out_size > 1 && i<commandEntryTableSize; ++i )
+    for( size_t i=0; out_size > 1 && i<commandEntryTableSize; ++i )
     {
       int j=0;
       while( out_size > 2 && commandEntryTable[i].command[j] != '\0' )
@@ -88,7 +92,8 @@ static int evaluate ( char* out, size_t out_size, char* in )
     return CLI_getLastReturnCode();
   }
   
-  snprintf( out, out_size-1, "Syntax Error. Unknown command \"%s\".", argv[0]);
+  static const PROGMEM char ENOMSG_MSG[] = "Syntax Error. Unknown command \"%s\".\n";
+  snprintf( out, out_size-1, ENOMSG_MSG, argv[0]);
   return -ENOMSG;
 }
 

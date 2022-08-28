@@ -101,7 +101,7 @@ extern "C" int CONIO_getchar(void)
 
 extern "C" size_t read_stdin(char* str, size_t n)
 {
-  int numRead=0;
+  size_t numRead=0;
   for( numRead=0; numRead <= n; numRead++)
   {
     int c=getche();
@@ -165,27 +165,32 @@ extern "C" int CONIO_scanf( const char * format, ...)
   return returnVal;
 }
 
+
 extern "C" void clrscr(void)
 {
-  Serial.write("\033[2J\033[H");
+  static const PROGMEM char s[] = "\033[2J\033[H";
+  Serial.write(s);
 }
 
 extern "C" void delline(void)
 {
-  Serial.write("\033[2K");
+  static const PROGMEM char s[] = "\033[2K";
+  Serial.write(s);
 }
 
 extern "C" void textcolor(int color)
 {
+  static const PROGMEM char fmt[] = "\033[38;5;%dm";
   char temp[128];
-  snprintf(temp,128,"\033[38;5;%dm", color);
+  snprintf(temp, 128, fmt, color);
   Serial.write(temp);
 }
 
 extern "C" void textbackground(int color)
 {
+  static const PROGMEM char fmt[] = "\033[48;5;%dm";
   char temp[128];
-  snprintf(temp,128,"\033[48;5;%dm", color);
+  snprintf(temp, 128, fmt, color);
   Serial.write(temp);
 }
 
@@ -196,13 +201,15 @@ extern "C" int kbhit(void)
 
 extern "C" void gotoxy(int x, int y)
 {
+  static const PROGMEM char fmt[] = "\033[%d;%dH";
   char temp[128];
-  snprintf(temp,128,"\033[%d;%dH", y, x);
+  snprintf(temp, 128, fmt, y, x);
   Serial.write(temp);
 }
 
 //extern "C" void whereCursor( int* x, int* y)
 //{
+//  static const PROGMEM char s[] = "\033[6n";
 //  //char temp[128];
 //  Serial.write("\033[6n");  
 //  //Serial.read()
