@@ -82,28 +82,33 @@ int DSP_main (int argc, char** argv)
 {
   static const PROGMEM char s_dec[]  ="sin(%d)=%d/32768\ncos(%d)=%d/32768\n\n";
   static const PROGMEM char s_hex[]  ="sin(0x%04X)=%d/32768\ncos(0x%04X)=%d/32768\n\n";
-  CORDIC16_t tmp=cordic16(BAM16_45_DEGREES);
+  SINCOS16_t tmp=CORDIC16_sincos(BAM16_45_DEGREES);
   printf( s_dec, 45, tmp.sin, 45, tmp.cos);
-  tmp=cordic16(BAM16_30_DEGREES);
+  tmp=CORDIC16_sincos(BAM16_30_DEGREES);
   printf( s_dec, 30, tmp.sin, 30, tmp.cos);
-  tmp=cordic16(BAM16_60_DEGREES);
+  tmp=CORDIC16_sincos(BAM16_60_DEGREES);
   printf( s_dec, 60, tmp.sin, 60, tmp.cos);
-  tmp=cordic16(0);
+  tmp=CORDIC16_sincos(0);
   printf( s_hex, 0, tmp.sin, 0, tmp.cos);
-  tmp=cordic16(0x2000);
+  tmp=CORDIC16_sincos(0x2000);
   printf( s_hex, 0x2000, tmp.sin, 0x2000, tmp.cos);
-  tmp=cordic16(0x4000);
+  tmp=CORDIC16_sincos(0x4000);
   printf( s_hex, 0x4000, tmp.sin, 0x4000, tmp.cos);
-  tmp=cordic16(0x6000);
+  tmp=CORDIC16_sincos(0x6000);
   printf( s_hex, 0x6000, tmp.sin, 0x6000, tmp.cos);
-  tmp=cordic16(0x8000);
+  tmp=CORDIC16_sincos(0x8000);
   printf( s_hex, 0x8000, tmp.sin, 0x8000, tmp.cos);
-  tmp=cordic16(0xA000);
+  tmp=CORDIC16_sincos(0xA000);
   printf( s_hex, 0xA000, tmp.sin, 0xA000, tmp.cos);
-  tmp=cordic16(0xC000);
+  tmp=CORDIC16_sincos(0xC000);
   printf( s_hex, 0xC000, tmp.sin, 0xC000, tmp.cos);
-  tmp=cordic16(0xE000);
+  tmp=CORDIC16_sincos(0xE000);
   printf( s_hex, 0xE000, tmp.sin, 0xE000, tmp.cos);
+
+  if (argc > 1)
+  {
+    printf( "%d\n", COSINE_TABLE[atoi(argv[1])]);
+  }
 
   return 2;
 }

@@ -39,6 +39,45 @@ void gotoxy(int x, int y);
 // int wherex(vodi);
 // int wherey(void);
 
+// COLORS
+
+// Old CONIO mapping
+// BLACK         0
+// BLUE          1   X
+// GREEN         2
+// CYAN          3   X
+// RED           4   X
+// MAGENTA       5
+// BROWN         6   X
+// LIGHTGRAY     7
+// DARKGRAY      8
+// LIGHTBLUE     9   X
+// LIGHTGREEN    10
+// LIGHTCYAN     11  X
+// LIGHTRED      12  X
+// LIGHTMAGENTA  13
+// YELLOW        14  X
+// WHITE         15 
+
+// Numbers reassigned to match ANSI colors
+#define BLACK            0
+#define RED              1
+#define GREEN            2
+#define BROWN            3
+#define BLUE             4
+#define MAGENTA          5
+#define CYAN             6
+#define LIGHTGRAY        7
+#define DARKGRAY         8
+#define LIGHTRED         9
+#define LIGHTGREEN       10
+#define YELLOW           11
+#define LIGHTBLUE        12
+#define LIGHTMAGENTA     13
+#define LIGHTCYAN        14
+#define WHITE            15
+
+
 #ifdef  __cplusplus
 }
 #endif

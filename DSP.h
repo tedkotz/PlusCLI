@@ -126,7 +126,7 @@ typedef struct Complex16
   };
 } Complex16;
 
-typedef Complex16 CORDIC16_t;
+typedef Complex16 SINCOS16_t;
 
 typedef struct Polar16
 {
@@ -145,6 +145,8 @@ static const BAM16 BAM16_60_DEGREES  = 0x10003/6; //BAM16_180_DEGREES/3+0.5
 static const BAM16 BAM16_45_DEGREES  = BAM16_90_DEGREES/2;
 static const BAM16 BAM16_30_DEGREES  = 0x8003/6;  //BAM16_90_DEGREES/3+0.5
 
+#define COSINE_TABLE_SIZE 256
+extern const Q_15 COSINE_TABLE[COSINE_TABLE_SIZE];
 /* Functions *****************************************************************/
 #define DEG2BAM16(X)  ((BAM16)(((X)*0x10000)/360))
 #define Q15_mult(A,B) ((((int32_t)(A))*((int32_t)(B)))>>15)
@@ -162,12 +164,20 @@ int16_t sub_sat ( int16_t a, int16_t b );
 int32_t UQ16_mult ( int32_t a, int32_t b );
 Q16_15 Q15_mac ( Q_15* a, Q_15* b , size_t count);
 UQ16_16 UQ16_mac ( UQ_16* a, UQ_16* b , size_t count);
-CORDIC16_t cordic16( BAM16 angle );
 Q15_DIVMOD_t Q15_divmod ( Q16_15 a, Q_15 b);
 void FFT( Q_15* dst, Q_15* src, int order );
+void IFFT( Q_15* dst, Q_15* src, int order );
+void Complex_FFT( Complex16* dst, Complex16* src, int order );
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
 
+
+
 // CORDIC
+Complex16 CORDIC16_rotate( BAM16 angle, Complex16 vector );
+Complex16 CORDIC16_polar2rect( Polar16 vector );
+Polar16 CORDIC16_rect2polar( Complex16 vector );
+SINCOS16_t CORDIC16_sincos( BAM16 angle );
+
 // COSINE
 // FFT-real
 // FFT-complex
