@@ -13,8 +13,7 @@ static size_t commandEntryTableSize=0;
 
 static const char* DEFAULTgetPrompt (void)
 {
-  static const PROGMEM char defaultPrompt[] = "\n> ";
-  return defaultPrompt;
+  return "\n> ";
 }
 
 const char* (*CLI_getPrompt) (void) = DEFAULTgetPrompt;
@@ -46,21 +45,21 @@ static bool commandTest( const char* input, const char* testValue )
 
 static int evaluate ( char* out, size_t out_size, char* in )
 {
-  static const PROGMEM char DELIM[] = " \t\n\r";
   char* argv[16];
   int argc=0;
-  char* token=strtok(in, DELIM);
+  char delim[5];
+  strcpy_P(delim, (const char*)F(" \t\n\r"));
+  char* token=strtok(in, delim);
 
   while( token != NULL )
   {
     if (argc >= 16)
     {
-      static const PROGMEM char E2BIG_MSG[] = "Syntax Error. Argument list(%d) too long.\n";
-      snprintf( out, out_size-1, E2BIG_MSG, argc);
+      printf( F("Syntax Error. Argument list(%d) too long.\n"), argc);
       return -E2BIG;
     }
     argv[argc++]=token;
-    token=strtok(NULL, DELIM);
+    token=strtok(NULL, delim);
   }
 
   for( size_t i=0; i<commandEntryTableSize; ++i )
@@ -68,8 +67,7 @@ static int evaluate ( char* out, size_t out_size, char* in )
     if ( commandTest( argv[0], commandEntryTable[i].command ) )
     {
       //return commandEntryTable[i].callBack(argc, argv, out, out_size);
-      static const PROGMEM char DONE_MSG[] = "\nDone.\n";
-      snprintf( out, out_size-1, DONE_MSG);
+      strncpy_P( out, (const char *)F("\nDone.\n"), out_size-1);
       return commandEntryTable[i].callBack(argc, argv);
     }
   }
@@ -92,8 +90,7 @@ static int evaluate ( char* out, size_t out_size, char* in )
     return CLI_getLastReturnCode();
   }
   
-  static const PROGMEM char ENOMSG_MSG[] = "Syntax Error. Unknown command \"%s\".\n";
-  snprintf( out, out_size-1, ENOMSG_MSG, argv[0]);
+  printf( out, out_size-1, F("Syntax Error. Unknown command \"%s\".\n"), argv[0]);
   return -ENOMSG;
 }
 

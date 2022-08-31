@@ -35,6 +35,8 @@ void textbackground(int color);
 int kbhit(void);
 void gotoxy(int x, int y);
 
+
+
 // void whereCursor( int* x, int* y)
 // int wherex(vodi);
 // int wherey(void);
@@ -80,4 +82,12 @@ void gotoxy(int x, int y);
 
 #ifdef  __cplusplus
 }
+
+// C++ functions to allow use of FlashStrings
+int CONIO_puts( const __FlashStringHelper* str);
+int CONIO_vprintf( const __FlashStringHelper* format, va_list args);
+int CONIO_printf( const __FlashStringHelper* format, ...);
+int vscanf(const __FlashStringHelper* format, va_list args);
+int CONIO_scanf( const __FlashStringHelper* format, ...);
+
 #endif

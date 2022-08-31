@@ -61,7 +61,10 @@ const PROGMEM Q_15 COSINE_TABLE[COSINE_TABLE_SIZE] =
 //{
 //  return (a * b) >> 15;
 //}
-
+Q_15 cosine_table( int x )
+{
+  return pgm_read_word(&COSINE_TABLE[x%COSINE_TABLE_SIZE]);
+}
 
 extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
 {
@@ -87,10 +90,10 @@ extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
 //    0x00028BE6, 0x000145F3, 0x0000A2FA, 0x0000517D,
 //    0x000028BE, 0x0000145F, 0x00000A30, 0x00000518,
 //  };
-  static const PROGMEM int N = 16;
+  #define CORDIC16_ITERS 16
   // Makes more effcient use of all 16 bits BAM32 >> 14
   // hex(arctan(2^(-index))*0x20000/pi+0.5)
-  static const PROGMEM uint16_t arctanTable[N] =
+  static const uint16_t arctanTable[CORDIC16_ITERS] =
   {
     0x8000, 0x4B90, 0x27ED, 0x1444, 
     0x0A2C, 0x0517, 0x028C, 0x0146,
@@ -132,7 +135,7 @@ extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
 
   int32_t angle32 = (int32_t)angle << 16;
     
-  for(int i=0; i<N; ++i)
+  for(int i=0; i<CORDIC16_ITERS; ++i)
   {
     if(angle32 < 0)
     {

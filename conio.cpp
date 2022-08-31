@@ -21,10 +21,23 @@ extern "C" int CONIO_puts( const char * str)
   const char * ptr = str;
   while( *ptr != '\0' )
   {
-    putchar(*ptr++);
+    CONIO_putchar(*ptr++);
   }
   return (ptr-str);
 }
+
+int CONIO_puts( const __FlashStringHelper* str)
+{
+  const char * ptr = (const char *)str;
+  char c = pgm_read_byte(ptr);
+  while( c != '\0' )
+  {
+    CONIO_putchar(c);
+    ptr++;
+  }
+  return (ptr-(const char *)str);
+}
+
 
 extern "C" int CONIO_vprintf( const char * format, va_list args)
 {
@@ -36,10 +49,29 @@ extern "C" int CONIO_vprintf( const char * format, va_list args)
   {
     char realBuf[realSize];
     vsnprintf(realBuf, realSize, format, args);
-    return puts(realBuf);
+    return CONIO_puts(realBuf);
   }
   
-  return puts(tryBuf);
+  return CONIO_puts(tryBuf);
+}
+
+int CONIO_vprintf( const __FlashStringHelper* format, va_list args)
+{
+  const unsigned trySize = 128;
+  size_t fmtSize = strlen_P((const char*)format)+1;
+  char fmtBuf[fmtSize];
+  char tryBuf[trySize];
+  strncpy_P(fmtBuf, (const char*)format, fmtSize);
+  unsigned realSize = vsnprintf(tryBuf, trySize, fmtBuf, args) + 1;
+
+  if( realSize > trySize)
+  {
+    char realBuf[realSize];
+    vsnprintf(realBuf, realSize, fmtBuf, args);
+    return CONIO_puts(realBuf);
+  }
+  
+  return CONIO_puts(tryBuf);
 }
 
 extern "C" int CONIO_printf( const char * format, ...)
@@ -47,7 +79,17 @@ extern "C" int CONIO_printf( const char * format, ...)
   va_list arg_ptr;
 
   va_start(arg_ptr, format);
-  int returnVal = vprintf(format, arg_ptr);
+  int returnVal = CONIO_vprintf(format, arg_ptr);
+  va_end(arg_ptr);
+  return returnVal;
+}
+
+int CONIO_printf( const __FlashStringHelper* format, ...)
+{
+  va_list arg_ptr;
+
+  va_start(arg_ptr, format);
+  int returnVal = CONIO_vprintf(format, arg_ptr);
   va_end(arg_ptr);
   return returnVal;
 }
@@ -168,30 +210,26 @@ extern "C" int CONIO_scanf( const char * format, ...)
 
 extern "C" void clrscr(void)
 {
-  static const PROGMEM char s[] = "\033[2J\033[H";
-  Serial.write(s);
+  Serial.print(F("\033[2J\033[H"));
 }
 
 extern "C" void delline(void)
 {
-  static const PROGMEM char s[] = "\033[2K";
-  Serial.write(s);
+  Serial.print(F("\033[2K"));
 }
 
 extern "C" void textcolor(int color)
 {
-  static const PROGMEM char fmt[] = "\033[38;5;%dm";
-  char temp[128];
-  snprintf(temp, 128, fmt, color);
-  Serial.write(temp);
+  Serial.print(F("\033[38;5;"));
+  Serial.print(color);
+  Serial.print('m');
 }
 
 extern "C" void textbackground(int color)
 {
-  static const PROGMEM char fmt[] = "\033[48;5;%dm";
-  char temp[128];
-  snprintf(temp, 128, fmt, color);
-  Serial.write(temp);
+  Serial.print(F("\033[48;5;"));
+  Serial.print(color);
+  Serial.print('m');
 }
 
 extern "C" int kbhit(void)
@@ -201,17 +239,16 @@ extern "C" int kbhit(void)
 
 extern "C" void gotoxy(int x, int y)
 {
-  static const PROGMEM char fmt[] = "\033[%d;%dH";
-  char temp[128];
-  snprintf(temp, 128, fmt, y, x);
-  Serial.write(temp);
+  Serial.print(F("\033["));
+  Serial.print(y);
+  Serial.print(';');
+  Serial.print(x);
+  Serial.print('H');
 }
 
 //extern "C" void whereCursor( int* x, int* y)
 //{
-//  static const PROGMEM char s[] = "\033[6n";
-//  //char temp[128];
-//  Serial.write("\033[6n");  
+//  Serial.print(F("\033[6n"));
 //  //Serial.read()
 //  //scanf("\033[%d;%dR", y, x)
 //}

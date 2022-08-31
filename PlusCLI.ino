@@ -12,6 +12,9 @@ int blink (int argc, char** argv)
   delay(500);                        // wait for a second
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
   delay(500);                        // wait for a second
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(500);                        // wait for a second
+  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
 
   return SUCCESS;
 }
@@ -71,7 +74,7 @@ int seedrand (int argc, char** argv)
       sum <<= 1;
       sum += *ptr++;
     }
-    printf("Checksum = %lX\n", sum);
+    printf(F("Checksum = %lX\n"), sum);
     randomSeed(sum);
   }
   return SUCCESS;
@@ -80,8 +83,8 @@ int seedrand (int argc, char** argv)
 
 int DSP_main (int argc, char** argv)
 {
-  static const PROGMEM char s_dec[]  ="sin(%d)=%d/32768\ncos(%d)=%d/32768\n\n";
-  static const PROGMEM char s_hex[]  ="sin(0x%04X)=%d/32768\ncos(0x%04X)=%d/32768\n\n";
+  const __FlashStringHelper* s_dec =F("sin(%d)=%d/32768\ncos(%d)=%d/32768\n\n");
+  const __FlashStringHelper* s_hex =F("sin(0x%04X)=%d/32768\ncos(0x%04X)=%d/32768\n\n");
   SINCOS16_t tmp=CORDIC16_sincos(BAM16_45_DEGREES);
   printf( s_dec, 45, tmp.sin, 45, tmp.cos);
   tmp=CORDIC16_sincos(BAM16_30_DEGREES);
@@ -107,37 +110,28 @@ int DSP_main (int argc, char** argv)
 
   if (argc > 1)
   {
-    printf( "%d\n", COSINE_TABLE[atoi(argv[1])]);
+    printf( F("%d\n"), cosine_table(atoi(argv[1])) );
   }
 
   return 2;
 }
 
-static const PROGMEM char BLINK_CMD  []  ="BLINK"  ;
-static const PROGMEM char ECHO_CMD   []  ="ECHO"   ;
-static const PROGMEM char BGCOLOR_CMD[]  ="BGCOLOR";
-static const PROGMEM char FGCOLOR_CMD[]  ="FGCOLOR";
-static const PROGMEM char SEED_CMD   []  ="SEED"   ;
-static const PROGMEM char GAME_CMD   []  ="GAME"   ;
-static const PROGMEM char DSP_CMD    []  ="DSP"    ;
-
-const PROGMEM CLI_CommandEntry commandEntryTable[] =
+const CLI_CommandEntry commandEntryTable[] =
 {
-  { BLINK_CMD   , blink           },
-  { ECHO_CMD    , echo            },
-  { BGCOLOR_CMD , bgcolor         },
-  { FGCOLOR_CMD , fgcolor         },
-  { SEED_CMD    , seedrand        },
-  { GAME_CMD    , minesweep_main  },
-  { DSP_CMD     , DSP_main        },
+  { "BLINK"   , blink           },
+  { "ECHO"    , echo            },
+  { "BGCOLOR" , bgcolor         },
+  { "FGCOLOR" , fgcolor         },
+  { "SEED"    , seedrand        },
+  { "GAME"    , minesweep_main  },
+  { "DSP"     , DSP_main        },
 };
 
 const char* getPrompt (void)
 {
-  static const PROGMEM char fmt[] = "\n%d,%d> ";
   static char prompt[32];
   static int count = 0;
-  snprintf(prompt, 31, fmt, count++, CLI_getLastReturnCode() );
+  snprintf(prompt, 31, "\n%d,%d> ", count++, CLI_getLastReturnCode() );
   return prompt;
 }
 
@@ -145,7 +139,7 @@ const char* getPrompt (void)
 void setup()
 {
   // put your setup code here, to run once:
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.setTimeout(LONG_MAX);
   randomSeed(analogRead(0));
   pinMode(LED_BUILTIN, OUTPUT);

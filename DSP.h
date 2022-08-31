@@ -146,7 +146,7 @@ static const BAM16 BAM16_45_DEGREES  = BAM16_90_DEGREES/2;
 static const BAM16 BAM16_30_DEGREES  = 0x8003/6;  //BAM16_90_DEGREES/3+0.5
 
 #define COSINE_TABLE_SIZE 256
-extern const Q_15 COSINE_TABLE[COSINE_TABLE_SIZE];
+
 /* Functions *****************************************************************/
 #define DEG2BAM16(X)  ((BAM16)(((X)*0x10000)/360))
 #define Q15_mult(A,B) ((((int32_t)(A))*((int32_t)(B)))>>15)
@@ -170,6 +170,7 @@ void IFFT( Q_15* dst, Q_15* src, int order );
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
 
+Q_15 cosine_table( int x );
 
 
 // CORDIC
