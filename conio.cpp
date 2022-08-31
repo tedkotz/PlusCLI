@@ -207,6 +207,26 @@ extern "C" int CONIO_scanf( const char * format, ...)
   return returnVal;
 }
 
+int vscanf(const __FlashStringHelper* format, va_list args)
+{
+  size_t fmtSize = strlen_P((const char*)format)+1;
+  char fmtBuf[fmtSize];
+  strncpy_P(fmtBuf, (const char*)format, fmtSize);
+  char temp[SCAN_BUFFER_SIZE];
+  gets_s(temp, SCAN_BUFFER_SIZE);
+  return vsscanf(temp, fmtBuf, args);
+}
+
+
+int CONIO_scanf(const __FlashStringHelper* format, ...)
+{
+  va_list arg_ptr;
+
+  va_start(arg_ptr, format);
+  int returnVal = vscanf(format, arg_ptr);
+  va_end(arg_ptr);
+  return returnVal;
+}
 
 extern "C" void clrscr(void)
 {
