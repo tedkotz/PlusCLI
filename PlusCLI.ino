@@ -5,6 +5,7 @@
 #include "mineswp.h"
 #include <limits.h>
 
+int monitor_main (int argc, char** argv);
 
 int blink (int argc, char** argv)
 {
@@ -125,6 +126,7 @@ const CLI_CommandEntry commandEntryTable[] =
   { "SEED"    , seedrand        },
   { "GAME"    , minesweep_main  },
   { "DSP"     , DSP_main        },
+  { "MONITOR" , monitor_main    },
 };
 
 const char* getPrompt (void)
