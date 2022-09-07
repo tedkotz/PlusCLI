@@ -252,6 +252,25 @@ extern "C" void textbackground(int color)
   Serial.print('m');
 }
 
+extern "C" void textblink(int blink)
+{
+  if( blink )
+  {
+    Serial.print(F("\033[5m"));
+  }
+  else
+  {
+    Serial.print(F("\033[25m"));
+  }
+}
+
+extern "C" void textattr(int attr)
+{
+  textcolor(       attr       & 0x00F);
+  textbackground( (attr >> 4) & 0x007);
+  textblink(      (attr >> 7) & 0x001);
+}
+
 extern "C" int kbhit(void)
 {
   return (-1 != Serial.peek());

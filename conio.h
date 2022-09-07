@@ -12,6 +12,23 @@
 #define gets      CONIO_gets
 #define scanf     CONIO_scanf
 
+#define _cgets    CONIO_gets
+#define _cprintf  CONIO_printf
+#define _cputs    CONIO_puts
+#define _cscanf   CONIO_scanf
+#define cgets     CONIO_gets
+#define cprintf   CONIO_printf
+#define cputs     CONIO_puts
+#define cscanf    CONIO_scanf
+
+#define _getch    getch
+#define _getche   getche
+#define _kbhit    kbhit
+#define _putch    CONIO_putchar
+#define putch     CONIO_putchar
+
+// #define _ungetch  ungetch
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,16 +47,30 @@ int vscanf(const char *format, va_list args);
 int CONIO_scanf( const char * format, ...);
 void clrscr(void);
 void delline(void);
+void textattr(int attr);
 void textcolor(int color);
 void textbackground(int color);
+void textblink(int blink);
 int kbhit(void);
 void gotoxy(int x, int y);
 
-
+// void clreol (void);
 
 // void whereCursor( int* x, int* y)
 // int wherex(vodi);
 // int wherey(void);
+// void  cputsxy (int x, int y, char *str);
+// void  putchxy (int x, int y, char ch);
+
+// void  _setcursortype (int type);
+//  _NOCURSOR
+//  _SOLIDCURSOR
+//  _NORMALCURSOR
+// void  normvideo (void);
+
+// int ungetch (int);
+// void clearkeybuf (void);
+
 
 // COLORS
 
