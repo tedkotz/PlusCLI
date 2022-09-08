@@ -29,6 +29,10 @@
 
 // #define _ungetch  ungetch
 
+#define _NOCURSOR      0
+#define _NORMALCURSOR  20
+#define _SOLIDCURSOR   100
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -54,19 +58,16 @@ void textblink(int blink);
 int kbhit(void);
 void gotoxy(int x, int y);
 
-// void clreol (void);
+void clreol (void);
 
 // void whereCursor( int* x, int* y)
-// int wherex(vodi);
+// int wherex(void);
 // int wherey(void);
-// void  cputsxy (int x, int y, char *str);
-// void  putchxy (int x, int y, char ch);
+int  cputsxy (int x, int y, const char* str);
+int  putchxy (int x, int y, int ch);
 
-// void  _setcursortype (int type);
-//  _NOCURSOR
-//  _SOLIDCURSOR
-//  _NORMALCURSOR
-// void  normvideo (void);
+void  _setcursortype (int type);
+void  normvideo (void);
 
 // int ungetch (int);
 // void clearkeybuf (void);
@@ -120,5 +121,6 @@ int CONIO_vprintf( const __FlashStringHelper* format, va_list args);
 int CONIO_printf( const __FlashStringHelper* format, ...);
 int vscanf(const __FlashStringHelper* format, va_list args);
 int CONIO_scanf( const __FlashStringHelper* format, ...);
+int cputsxy (int x, int y, const __FlashStringHelper* str);
 
 #endif

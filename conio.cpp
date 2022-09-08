@@ -33,7 +33,7 @@ int CONIO_puts( const __FlashStringHelper* str)
   while( c != '\0' )
   {
     CONIO_putchar(c);
-    ptr++;
+    c = pgm_read_byte(++ptr);
   }
   return (ptr-(const char *)str);
 }
@@ -238,6 +238,11 @@ extern "C" void delline(void)
   Serial.print(F("\033[2K"));
 }
 
+extern "C" void clreol (void)
+{
+  Serial.print(F("\033[0K"));
+}
+
 extern "C" void textcolor(int color)
 {
   Serial.print(F("\033[38;5;"));
@@ -271,6 +276,24 @@ extern "C" void textattr(int attr)
   textblink(      (attr >> 7) & 0x001);
 }
 
+void  _setcursortype (int type)
+{
+  if( _NOCURSOR == type )
+  {
+    Serial.print(F("\033[?25l"));    
+  }
+  else
+  {
+    Serial.print(F("\033[?25h"));    
+  }
+}
+
+void  normvideo (void)
+{
+  Serial.print(F("\033[0m"));  
+}
+
+
 extern "C" int kbhit(void)
 {
   return (-1 != Serial.peek());
@@ -284,6 +307,26 @@ extern "C" void gotoxy(int x, int y)
   Serial.print(x);
   Serial.print('H');
 }
+
+extern "C" int putchxy (int x, int y, int ch)
+{
+  gotoxy(x, y);
+  return CONIO_putchar(ch);
+}
+
+extern "C" int cputsxy (int x, int y, const char* str)
+{
+  gotoxy(x, y);
+  return CONIO_puts(str);
+}
+
+int cputsxy (int x, int y, const __FlashStringHelper* str)
+{
+  gotoxy(x, y);
+  return CONIO_puts(str);  
+}
+
+
 
 //extern "C" void whereCursor( int* x, int* y)
 //{

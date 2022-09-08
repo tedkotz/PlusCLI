@@ -121,6 +121,12 @@ static void printBoard( )
   }
   putchar('|');
   putchar('\n');
+
+  cputsxy( BOARDX+5,  4, F("   W") );
+  cputsxy( BOARDX+5,  5, F(" A S D - Move") );
+  cputsxy( BOARDX+5,  7, F("  . >  - Try Space") );
+  cputsxy( BOARDX+5,  9, F("  / ?  - Flag Space") );
+  cputsxy( BOARDX+5, 11, F("   Q   - Quit") );
 }
 
 /**
@@ -339,6 +345,7 @@ static void processInput( char c )
 // See mineswp.h
 int minesweep_main (int argc, char** argv)
 {
+  _setcursortype(_NOCURSOR);
   initGame();
   printBoard();
   char input = getch();
@@ -348,6 +355,9 @@ int minesweep_main (int argc, char** argv)
     printBoard();
     input = getch();
   }
+  _setcursortype(_NORMALCURSOR);
+  normvideo();
+  clrscr();
   return 0;
 }
 
