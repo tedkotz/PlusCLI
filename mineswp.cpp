@@ -25,6 +25,7 @@
 
 #define BOMB 15
 #define HIDDEN_BOMB (HIDDEN | 15)
+#define EXPLOSION 14
 
 #define STATE_MASK 0b11000000
 #define COUNT_MASK 0b00001111
@@ -55,6 +56,8 @@ static byte playerHidden=0;
  */
 static void printBoard( )
 {
+  int wincount = (BOARDX * BOARDY) - NUM_MINES;
+  bool lose = false;
   clrscr();
   for( int y = 0; y< BOARDY; ++y )
   {
@@ -86,11 +89,17 @@ static void printBoard( )
           case REVEALED:
           {
             int count = Board[x][y] & COUNT_MASK;
+            --wincount;
 
             switch (count)
             {
               case BOMB:
                 c='*';
+                break;
+
+              case EXPLOSION:
+                lose = true;
+                c='O';
                 break;
 
               case 0:
@@ -122,10 +131,21 @@ static void printBoard( )
   putchar('|');
   putchar('\n');
 
-  cputsxy( BOARDX+5,  4, F("   W") );
-  cputsxy( BOARDX+5,  5, F(" A S D - Move") );
-  cputsxy( BOARDX+5,  7, F("  . >  - Try Space") );
-  cputsxy( BOARDX+5,  9, F("  / ?  - Flag Space") );
+  if( lose )
+  {
+    puts(F("YOU LOSE.\n"));
+  }
+  else if ( wincount < 1)
+  {
+    puts(F("YOU WIN!!!\n"));    
+  }
+  else
+  {
+    cputsxy( BOARDX+5,  4, F("   W") );
+    cputsxy( BOARDX+5,  5, F(" A S D - Move") );
+    cputsxy( BOARDX+5,  7, F("  . >  - Try Space") );
+    cputsxy( BOARDX+5,  9, F("  / ?  - Flag Space") );
+  }
   cputsxy( BOARDX+5, 11, F("   Q   - Quit") );
 }
 
@@ -181,6 +201,7 @@ static void revealSpace( int x, int y )
   {
     if (isBomb(Board[x][y]))
     {
+      Board[x][y]=EXPLOSION;
       for( int y = 0; y< BOARDY; ++y )
       {
         for( int x = 0; x< BOARDX; ++x )

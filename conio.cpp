@@ -94,25 +94,52 @@ int CONIO_printf( const __FlashStringHelper* format, ...)
   return returnVal;
 }
 
+#define EMPTY_UNGETCHAR -1
+static int ungetchar = EMPTY_UNGETCHAR;
+
+extern "C" int ungetch (int c)
+{
+  ungetchar = c & 0x00FF;
+  return 0;
+}
+
+extern "C" void clearkeybuf (void)
+{
+  ungetchar=EMPTY_UNGETCHAR;
+  while(Serial.available())
+  {
+    Serial.read();
+  }  
+}
+
 extern "C" int getch(void)
 {
-  int c = Serial.read();
-  while (c==-1)
+  if( EMPTY_UNGETCHAR == ungetchar )
   {
-    delay(100);
-    c = Serial.read();
-  } 
-
-  switch( c )
+    int c = Serial.read();
+    while (c==-1)
+    {
+      delay(100);
+      c = Serial.read();
+    } 
+  
+    switch( c )
+    {
+      // Check for enter
+      case '\n':
+      case '\r':
+        return '\n';
+  
+      default:
+        return c;
+    } 
+  }
+  else
   {
-    // Check for enter
-    case '\n':
-    case '\r':
-      return '\n';
-
-    default:
-      return c;
-  } 
+    int c = ungetchar;
+    ungetchar = EMPTY_UNGETCHAR;
+    return c;    
+  }
 }
 
 extern "C" int getche(void)
@@ -141,29 +168,28 @@ extern "C" int CONIO_getchar(void)
   return getche();
 }
 
-extern "C" size_t read_stdin(char* str, size_t n)
+extern "C" size_t read_until(char* str, size_t n, const int until)
 {
   size_t numRead=0;
   for( numRead=0; numRead <= n; numRead++)
   {
     int c=getche();
-    
-    switch( c )
+
+    if( until == c)
     {
-      // Check for enter
-      case '\n':
-        return numRead;
-
+      // check for terminator
+      return numRead;      
+    }
+    else if ( '\b' == c ||
+              127  == c )
+    {
       // Check for backspace or delete
-      case '\b':
-      case 127:
-        numRead -= 2;
-        break;
-
-      default:
-        str[numRead]=c;
-        break;
-    } 
+      numRead -= 2;
+    }
+    else
+    {
+      str[numRead]=c;
+    }
   }
 
   return numRead;
@@ -171,7 +197,7 @@ extern "C" size_t read_stdin(char* str, size_t n)
 
 extern "C" char* gets_s(char* str, size_t n)
 {
-  int numRead=read_stdin(str, n-1);
+  int numRead=read_until(str, n-1, '\n');
   str[numRead]='\0';
   return str;
 }
@@ -182,12 +208,36 @@ extern "C" char* CONIO_gets(char* str)
 }
 
 #ifdef __AVR__
-// AVR compiler doesn't define vssscanf so we will make a very naive version that only supports 3 args
-static int vsscanf(const char *str, const char *format, va_list args)
+// AVR compiler doesn't define vssscanf so we will make a very naive version that only supports upto 8 args
+static int vsscanf(const char *str, const char *format, va_list arg_list)
 {
-  return sscanf(str, format, va_arg(args, void*), va_arg(args, void*), va_arg(args, void*));
+  void* arg[8];
+  for( int i=0; i<8; ++i)
+  {
+    arg[i]= va_arg(arg_list, void*);
+  }
+  return sscanf(str, format, arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7] );
 }
 #endif
+
+int vsscanf(const char *str, const __FlashStringHelper* format, va_list args)
+{
+  size_t fmtSize = strlen_P((const char*)format)+1;
+  char fmtBuf[fmtSize];
+  strncpy_P(fmtBuf, (const char*)format, fmtSize);
+  return vsscanf(str, fmtBuf, args);
+}
+
+int sscanf( const char *str, const __FlashStringHelper* format, ...)
+{
+  va_list arg_ptr;
+
+  va_start(arg_ptr, format);
+  int returnVal = vsscanf(str, format, arg_ptr);
+  va_end(arg_ptr);
+  return returnVal;
+}
+
 
 extern "C" int vscanf(const char *format, va_list args)
 {
@@ -195,7 +245,6 @@ extern "C" int vscanf(const char *format, va_list args)
   gets_s(temp, SCAN_BUFFER_SIZE);
   return vsscanf(temp, format, args);
 }
-
 
 extern "C" int CONIO_scanf( const char * format, ...)
 {
@@ -326,14 +375,36 @@ int cputsxy (int x, int y, const __FlashStringHelper* str)
   return CONIO_puts(str);  
 }
 
+extern "C" void whereCursor( int* x, int* y)
+{
+  int c;
+  char junk;
+  char temp[SCAN_BUFFER_SIZE];
+  
+  Serial.print(F("\033[6n"));
+  c = Serial.read();
+  while( c != '\033' )
+  {
+    c = Serial.read();
+  }
+  putch(c);
+  c=read_until( temp, SCAN_BUFFER_SIZE-1, 'R' );
+  temp[c]='\0';
+  sscanf(temp, F("%c%d%c%d"), &junk, y, &junk, x);
+}
 
+extern "C" int wherex(void)
+{
+  int x;
+  int y;
+  whereCursor( &x, &y);
+  return x;
+}
 
-//extern "C" void whereCursor( int* x, int* y)
-//{
-//  Serial.print(F("\033[6n"));
-//  //Serial.read()
-//  //scanf("\033[%d;%dR", y, x)
-//}
-
-// extern "C" int wherex(void);
-// extern "C" int wherey(void);
+extern "C" int wherey(void)
+{
+  int x;
+  int y;
+  whereCursor( &x, &y);
+  return y;
+}

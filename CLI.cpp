@@ -103,11 +103,11 @@ extern "C" void CLI_loop(void)
 
   // Print Prompt
   puts( CLI_getPrompt() );
-  size_t OutIndex = read_stdin(iobuffer, MAX_IO_BUFFER - 1);
+  size_t OutIndex = read_until(iobuffer, MAX_IO_BUFFER - 1, '\n');
   while( OutIndex == 0 )
   {
     puts( CLI_getPrompt() );
-    OutIndex = read_stdin(iobuffer, MAX_IO_BUFFER - 1);
+    OutIndex = read_until(iobuffer, MAX_IO_BUFFER - 1, '\n');
   }
   iobuffer[OutIndex++]='\0';
 

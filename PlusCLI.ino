@@ -22,11 +22,14 @@ int blink (int argc, char** argv)
 
 int echo (int argc, char** argv)
 {
+  int x, y;
   if( argc >= 2 )
   {
     puts(argv[1]);
   }
-  putchar('\n');
+  whereCursor( &x, &y);
+  //putchar('\n');
+  printf(F("\nx=%d y=%d\n"), x, y);
   return SUCCESS;
 }
 
