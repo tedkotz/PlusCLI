@@ -28,7 +28,6 @@ int echo (int argc, char** argv)
     puts(argv[1]);
   }
   whereCursor( &x, &y);
-  //putchar('\n');
   printf(F("\nx=%d y=%d\n"), x, y);
   return SUCCESS;
 }
@@ -87,36 +86,24 @@ int seedrand (int argc, char** argv)
 
 int DSP_main (int argc, char** argv)
 {
-  const __FlashStringHelper* s_dec =F("sin(%d)=%d/32768\ncos(%d)=%d/32768\n\n");
-  const __FlashStringHelper* s_hex =F("sin(0x%04X)=%d/32768\ncos(0x%04X)=%d/32768\n\n");
-  SINCOS16_t tmp=CORDIC16_sincos(BAM16_45_DEGREES);
-  printf( s_dec, 45, tmp.sin, 45, tmp.cos);
-  tmp=CORDIC16_sincos(BAM16_30_DEGREES);
-  printf( s_dec, 30, tmp.sin, 30, tmp.cos);
-  tmp=CORDIC16_sincos(BAM16_60_DEGREES);
-  printf( s_dec, 60, tmp.sin, 60, tmp.cos);
-  tmp=CORDIC16_sincos(0);
-  printf( s_hex, 0, tmp.sin, 0, tmp.cos);
-  tmp=CORDIC16_sincos(0x2000);
-  printf( s_hex, 0x2000, tmp.sin, 0x2000, tmp.cos);
-  tmp=CORDIC16_sincos(0x4000);
-  printf( s_hex, 0x4000, tmp.sin, 0x4000, tmp.cos);
-  tmp=CORDIC16_sincos(0x6000);
-  printf( s_hex, 0x6000, tmp.sin, 0x6000, tmp.cos);
-  tmp=CORDIC16_sincos(0x8000);
-  printf( s_hex, 0x8000, tmp.sin, 0x8000, tmp.cos);
-  tmp=CORDIC16_sincos(0xA000);
-  printf( s_hex, 0xA000, tmp.sin, 0xA000, tmp.cos);
-  tmp=CORDIC16_sincos(0xC000);
-  printf( s_hex, 0xC000, tmp.sin, 0xC000, tmp.cos);
-  tmp=CORDIC16_sincos(0xE000);
-  printf( s_hex, 0xE000, tmp.sin, 0xE000, tmp.cos);
+  SINCOS16_t tmp;
+  Q_15 cosine;
+  Q_15 sine;
+  uint16_t deg = 0;
+  for( int i =0; i<COSINE_TABLE_SIZE; ++i)
+  {
+    tmp = CORDIC16_sincos(deg);
+    cosine = cosine_table(deg>>8);
+    sine = cosine_table((deg+BAM16_270_DEGREES)>>8);
+    printf( F("Angle(%04hX) sin:% 6d - % 6d=% 6d\tcos:% 6d - % 6d=% 6d\n"), deg, tmp.sin, sine, tmp.sin-sine, tmp.cos, cosine, tmp.cos-cosine);
+    deg += 0x0100;
+  }
 
   if (argc > 1)
   {
     printf( F("%d\n"), cosine_table(atoi(argv[1])) );
   }
-
+  
   return 2;
 }
 

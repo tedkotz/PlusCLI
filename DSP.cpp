@@ -9,10 +9,15 @@
 /* Includes ******************************************************************/
 #include "DSP.h"
 #include <avr/pgmspace.h>
+
 /* Defines *******************************************************************/
+
 /* Types *********************************************************************/
+
 /* Interfaces ****************************************************************/
+
 /* Data **********************************************************************/
+
 
 /** 
  *  A table of reference cosine wave values for comparing against. 
@@ -61,9 +66,21 @@ const PROGMEM Q_15 COSINE_TABLE[COSINE_TABLE_SIZE] =
 //{
 //  return (a * b) >> 15;
 //}
-Q_15 cosine_table( int x )
+Q_15 cosine_table( uint8_t x )
 {
   return pgm_read_word(&COSINE_TABLE[x%COSINE_TABLE_SIZE]);
+}
+
+Q16_15 Q15_MAC( Q_15* a, Q_15* b, int16_t count)
+{
+  Q16_15 total=0;
+  //for(int i=0; i<count; ++i)
+  while(count--)
+  {
+    total += (((Q16_15)(*a++) * (Q16_15)(*b++)) >>8);
+  }
+
+  return ( total + (1 << 6)) >> 7;
 }
 
 extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
@@ -126,7 +143,7 @@ extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
   int32_t vtmp;
   
   // Use Symmetry to get angle in quadrant 1 or 4.
-  if( (angle + 0x4000) & 0x8000 )
+  if( ((uint16_t)angle + 0x4000) & 0x8000 )
   {
     angle += 0x8000;
     vcos = -vcos;

@@ -170,7 +170,7 @@ void IFFT( Q_15* dst, Q_15* src, int order );
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
 
-Q_15 cosine_table( int x );
+Q_15 cosine_table( uint8_t x );
 
 
 // CORDIC
