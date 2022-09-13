@@ -19,6 +19,8 @@ extern "C" {
 #include <stdlib.h>
 
 /* Defines *******************************************************************/
+#define Q15_ZERO 0x0000
+#define Q15_ONE  0x7FFF
 
 
 /* Types *********************************************************************/
@@ -52,9 +54,11 @@ extern "C" {
  *  |360     |2PI     |1     |0x0000   |
  *
  *  https://en.wikipedia.org/wiki/Binary_angular_measurement
+ *  
+ *  This type is unsigned so as to take advantage of the defined wrapping behaviour of unsinged integer types in C.
  */
-typedef int16_t BAM16;
-//typedef int32_t BAM32;
+typedef uint16_t BAM16;
+//typedef uint32_t BAM32;
 
 
 /*
@@ -151,6 +155,19 @@ static const BAM16 BAM16_30_DEGREES  = 0x8003/6;  //BAM16_90_DEGREES/3+0.5
 #define DEG2BAM16(X)  ((BAM16)(((X)*0x10000)/360))
 #define Q15_mult(A,B) ((((int32_t)(A))*((int32_t)(B)))>>15)
 
+// BAM16 Quadrant tests
+#define BAM16_Quad4(X) (0xC000U==((X)&0xC000U))
+#define BAM16_Quad3(X) (0x8000U==((X)&0xC000U))
+#define BAM16_Quad2(X) (0x4000U==((X)&0xC000U))
+#define BAM16_Quad1(X) (0x0000U==((X)&0xC000U))
+
+#define BAM16_Quad34(X) ((X)&0x8000U)
+#define BAM16_Quad24(X) ((X)&0x4000U)
+#define BAM16_Quad23(X) BAM16_Quad34((X)+0x4000U)
+#define BAM16_Quad14(X) BAM16_Quad34((X)-0x4000U)
+#define BAM16_Quad13(X) (!BAM16_Quad24(X))
+#define BAM16_Quad12(X) (!BAM16_Quad34(X))
+
 
 /**
  * [Description]
@@ -177,7 +194,9 @@ Q_15 cosine_table( uint8_t x );
 Complex16 CORDIC16_rotate( BAM16 angle, Complex16 vector );
 Complex16 CORDIC16_polar2rect( Polar16 vector );
 Polar16 CORDIC16_rect2polar( Complex16 vector );
-SINCOS16_t CORDIC16_sincos( BAM16 angle );
+
+//SINCOS16_t CORDIC16_sincos( BAM16 angle );
+#define CORDIC16_sincos(A) (CORDIC16_rotate( A, {Q15_ONE, 0}))
 
 // COSINE
 // FFT-real

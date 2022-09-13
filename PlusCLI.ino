@@ -89,8 +89,8 @@ int DSP_main (int argc, char** argv)
   SINCOS16_t tmp;
   Q_15 cosine;
   Q_15 sine;
-  uint16_t deg = 0;
-  for( int i =0; i<COSINE_TABLE_SIZE; ++i)
+  BAM16 deg = 0;
+  for( int i=0; i<COSINE_TABLE_SIZE; ++i)
   {
     tmp = CORDIC16_sincos(deg);
     cosine = cosine_table(deg>>8);

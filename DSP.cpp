@@ -8,7 +8,7 @@
  */
 /* Includes ******************************************************************/
 #include "DSP.h"
-#include <avr/pgmspace.h>
+#include <Arduino.h>
 
 /* Defines *******************************************************************/
 
@@ -83,7 +83,7 @@ Q16_15 Q15_MAC( Q_15* a, Q_15* b, int16_t count)
   return ( total + (1 << 6)) >> 7;
 }
 
-extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
+extern "C" Complex16 CORDIC16_rotate( BAM16 angle, Complex16 vector )
 {
   // Initialization of tables of constants used by CORDIC
   // need a table of arctangents of negative powers of two:
@@ -108,7 +108,7 @@ extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
 //    0x000028BE, 0x0000145F, 0x00000A30, 0x00000518,
 //  };
   #define CORDIC16_ITERS 16
-  // Makes more effcient use of all 16 bits BAM32 >> 14
+  // Makes more effcient use of all 16 bits (BAM32 >> 14)
   // hex(arctan(2^(-index))*0x20000/pi+0.5)
   static const uint16_t arctanTable[CORDIC16_ITERS] =
   {
@@ -117,8 +117,8 @@ extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
     0x00A3, 0x0051, 0x0029, 0x0014,
     0x000A, 0x0005, 0x0003, 0x0001,
   };
-  
-  
+
+  // Kvalues compensate for gain from CORDIC.
   // hex(0.5+0x8000*1/sqrt(1+(2^(-2*(0))))*1/sqrt(1+(2^(-2*(1))))*1/sqrt(1+(2^(-2*(2))))*1/sqrt(1+(2^(-2*(3))))*1/sqrt(1+(2^(-2*(4))))*1/sqrt(1+(2^(-2*(5))))*1/sqrt(1+(2^(-2*(6))))*1/sqrt(1+(2^(-2*(7))))*1/sqrt(1+(2^(-2*(8))))*1/sqrt(1+(2^(-2*(9)))))
   // and a table of products of reciprocal lengths of vectors [1, 2^-2j]:
   // K[k] = 0x8000
@@ -137,42 +137,70 @@ extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
   // As long as N > ~14 0x4DBA76D4 is a great Q_31 approximation
 
   
-  int32_t vsin = 0;
-//  int32_t vcos = 0x4DBA76D4; // K[N-1] * 2^31
-  int32_t vcos = 0x4DB9DB5F; // K[N-1] * 0x7FFF * 2^16
-  int32_t vtmp;
+  //int32_t vsin = 0;
+  //int32_t vcos = 0x4DB9DB5F; // K[N-1] * 0x7FFF * 2^16
+  
+  int32_t y = (int32_t)vector.y*0x04DBA; // *K[N-1] * 2^15
+  int32_t x = (int32_t)vector.x*0x04DBA; // *K[N-1] * 2^15
   
   // Use Symmetry to get angle in quadrant 1 or 4.
-  if( ((uint16_t)angle + 0x4000) & 0x8000 )
+  if( BAM16_Quad23(angle) )
   {
-    angle += 0x8000;
-    vcos = -vcos;
-    vsin = -vsin;
+    angle += BAM16_180_DEGREES;
+    x = -x;
+    y = -y;
   }
 
-  int32_t angle32 = (int32_t)angle << 16;
+  uint32_t angle32 = (uint32_t)angle << 16;
     
   for(int i=0; i<CORDIC16_ITERS; ++i)
   {
-    if(angle32 < 0)
+    // Check if angle is in Quadrant 3 or 4
+    if(angle32 & 0x80000000)
     {
-      angle32 += (int32_t)arctanTable[i] << 14;
-      vtmp = vcos + (vsin >> i);
-      vsin = vsin - (vcos >> i);
-      vcos = vtmp;
+      // Rotate Counter-Clockwise
+      int32_t tmp = x + (y >> i);
+      y = y - (x >> i);
+      x = tmp;
+      angle32 += (uint32_t)arctanTable[i] << 14;
     }
     else
     {
-      angle32 -= (int32_t)arctanTable[i] << 14;
-      vtmp = vcos - (vsin >> i);
-      vsin = vsin + (vcos >> i);
-      vcos = vtmp;
+      // Rotate Clockwise
+      int32_t tmp = x - (y >> i);
+      y = y + (x >> i);
+      x = tmp;
+      angle32 -= (uint32_t)arctanTable[i] << 14;
     }
   }
-  
-  SINCOS16_t v={ (Q_15)((vcos+0x8000) >> 16) , (Q_15)((vsin+0x8000) >> 16)};
 
-  return v;
+  // convert to Q_15, round and saturate
+  x=(x+0x4000) >> 15;
+  x=constrain(x,-Q15_ONE, Q15_ONE);
+  
+  y=(y+0x4000) >> 15;
+  y=constrain(y,-Q15_ONE, Q15_ONE);
+  
+  return { (Q_15)x , (Q_15)y};
+
+}
+
+//extern "C" SINCOS16_t CORDIC16_sincos( BAM16 angle )
+//{
+//  return CORDIC16_rotate( angle, {0x7FFF, 0});
+//
+//}
+
+extern "C" Complex16 CORDIC16_polar2rect( Polar16 vector )
+{
+  return CORDIC16_rotate(vector.phase, {vector.mag, 0}); 
+}
+
+extern "C" Polar16 CORDIC16_rect2polar( Complex16 vector )
+{
+  // Determine angle by rotating based on y value.
+  // when y==0 mag=x, phase = -angle
+  return {0, 0};
 }
 
 
