@@ -107,6 +107,71 @@ int DSP_main (int argc, char** argv)
   return 2;
 }
 
+void bargraph( const Q_15* data, int N)
+{
+  while( N-- )
+  {
+    Q_15 val = *data++;
+    printf(F("\n0x%04hx : "),val);
+    unsigned int hashes = (((int)val+0x8200) >> 10) & 0x3F;
+    while( hashes-- )
+    {
+      putch('#');
+    }
+  }
+  putch('\n');
+}
+
+int DSP2_main (int argc, char** argv)
+{
+  SINCOS16_t tmp;
+  Q_15 input[32];
+  Q_15 output[32];
+  BAM16 angle;
+  BAM16 dAngle;
+  
+
+  puts(F("building signal\n"));
+  angle = 0;
+  dAngle = FREQUENCY_BAM16_PER_SAMPLE(128,1024);
+  for( int i=0; i<32; ++i)
+  {
+    tmp = CORDIC16_sincos(angle);
+    input[i]= tmp.cos >> 3;
+    angle += dAngle;
+  }
+
+  angle = BAM16_45_DEGREES;
+  dAngle = FREQUENCY_BAM16_PER_SAMPLE(192,1024);
+  for( int i=0; i<32; ++i)
+  {
+    tmp = CORDIC16_sincos(angle);
+    input[i]+= (tmp.cos >> 2);
+    angle += dAngle;
+  }
+
+  angle = 0;
+  dAngle = FREQUENCY_BAM16_PER_SAMPLE(288,1024);
+  for( int i=0; i<32; ++i)
+  {
+    tmp = CORDIC16_sincos(angle);
+    input[i]+= (tmp.cos >> 2);
+    angle += dAngle;
+  }
+
+  bargraph( input, 32);
+
+  puts(F("Inphase\n"));
+  FFT_inphase( output, input, 5);
+  bargraph( output, 32);
+
+  puts(F("Quadrature\n"));
+  FFT_quad( output, input, 5);
+  bargraph( output, 32);
+
+  return 0;  
+}
+
 const CLI_CommandEntry commandEntryTable[] =
 {
   { "BLINK"   , blink           },
@@ -116,6 +181,7 @@ const CLI_CommandEntry commandEntryTable[] =
   { "SEED"    , seedrand        },
   { "GAME"    , minesweep_main  },
   { "DSP"     , DSP_main        },
+  { "FFT"     , DSP2_main       },
   { "MONITOR" , monitor_main    },
 };
 

@@ -177,7 +177,6 @@ extern "C" Complex16 CORDIC16_rotate( BAM16 angle, Complex16 vector )
   // convert to Q_15, round and saturate
   x=(x+0x4000) >> 15;
   x=constrain(x,-Q15_ONE, Q15_ONE);
-  
   y=(y+0x4000) >> 15;
   y=constrain(y,-Q15_ONE, Q15_ONE);
   
@@ -201,6 +200,43 @@ extern "C" Polar16 CORDIC16_rect2polar( Complex16 vector )
   // Determine angle by rotating based on y value.
   // when y==0 mag=x, phase = -angle
   return {0, 0};
+}
+
+
+
+
+void FFT_real( Q_15* dst, const Q_15* src, int order , uint16_t phase)
+{
+  int N=1<<order;
+  uint16_t dAngle=0;
+  uint16_t ddAngle=(1<<(8-order));
+  for( int i=0; i<N; ++i)
+  {
+    Q16_15 sum = 0;
+    const Q_15* tmp=src;
+    uint16_t angle=phase;
+    for( int j=0; j<N; ++j)
+    {
+      sum += ((Q16_15)cosine_table(angle) * (Q16_15)(*tmp++))>>8;
+      angle+=dAngle;
+    }
+    *dst++ = (sum + (1 << (6+order))>> (7+order));
+    dAngle+=ddAngle;
+  }
+}
+
+
+// Minimum = 0
+// Step = SAMPLE_RATE * 2^(-order)
+// Maximum = SAMPLE_RATE/2
+void FFT_inphase( Q_15* dst, const Q_15* src, int order )
+{
+  return FFT_real(dst, src, order, 0);
+}
+
+void FFT_quad( Q_15* dst, const Q_15* src, int order )
+{
+  return FFT_real(dst, src, order, 0x40); // start at -pi/2 radians
 }
 
 

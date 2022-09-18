@@ -155,6 +155,8 @@ static const BAM16 BAM16_30_DEGREES  = 0x8003/6;  //BAM16_90_DEGREES/3+0.5
 #define DEG2BAM16(X)  ((BAM16)(((X)*0x10000)/360))
 #define Q15_mult(A,B) ((((int32_t)(A))*((int32_t)(B)))>>15)
 
+#define FREQUENCY_BAM16_PER_SAMPLE( HZ, SAMPLE_RATE ) ((BAM16)(((uint32_t)(HZ) << 16)/(SAMPLE_RATE)))
+
 // BAM16 Quadrant tests
 #define BAM16_Quad4(X) (0xC000U==((X)&0xC000U))
 #define BAM16_Quad3(X) (0x8000U==((X)&0xC000U))
@@ -182,7 +184,8 @@ int32_t UQ16_mult ( int32_t a, int32_t b );
 Q16_15 Q15_mac ( Q_15* a, Q_15* b , size_t count);
 UQ16_16 UQ16_mac ( UQ_16* a, UQ_16* b , size_t count);
 Q15_DIVMOD_t Q15_divmod ( Q16_15 a, Q_15 b);
-void FFT( Q_15* dst, Q_15* src, int order );
+void FFT_inphase( Q_15* dst, const Q_15* src, int order );
+void FFT_quad( Q_15* dst, const Q_15* src, int order );
 void IFFT( Q_15* dst, Q_15* src, int order );
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
