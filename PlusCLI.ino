@@ -87,6 +87,7 @@ int seedrand (int argc, char** argv)
 int DSP_main (int argc, char** argv)
 {
   SINCOS16_t tmp;
+  Polar16 tmp2;
   Q_15 cosine;
   Q_15 sine;
   BAM16 deg = 0;
@@ -95,7 +96,8 @@ int DSP_main (int argc, char** argv)
     tmp = CORDIC16_sincos(deg);
     cosine = cosine_table(deg>>8);
     sine = cosine_table((deg+BAM16_270_DEGREES)>>8);
-    printf( F("Angle(%04hX) sin:% 6d - % 6d=% 6d\tcos:% 6d - % 6d=% 6d\n"), deg, tmp.sin, sine, tmp.sin-sine, tmp.cos, cosine, tmp.cos-cosine);
+    tmp2 = CORDIC16_rect2polar( tmp);
+    printf( F("Angle(%04hX) sin:% 6d - % 6d=% 6d\tcos:% 6d - % 6d=% 6d  0x%04hX 0x%04hX\n"), deg, tmp.sin, sine, tmp.sin-sine, tmp.cos, cosine, tmp.cos-cosine, tmp2.mag, tmp2.phase);
     deg += 0x0100;
   }
 
@@ -162,11 +164,11 @@ int DSP2_main (int argc, char** argv)
   bargraph( input, 32);
 
   puts(F("Inphase\n"));
-  FFT_inphase( output, input, 5);
+  FFT_inphase( output, input, 5, 0);
   bargraph( output, 32);
 
   puts(F("Quadrature\n"));
-  FFT_quad( output, input, 5);
+  FFT_inphase( output, input, 5, BAM16toBAM8(BAM16_90_DEGREES));
   bargraph( output, 32);
 
   puts(F("Magnitude\n"));

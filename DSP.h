@@ -58,7 +58,7 @@ extern "C" {
  *  This type is unsigned so as to take advantage of the defined wrapping behaviour of unsinged integer types in C.
  *  
  *  Real frequencies are represented in ratios as BAM16 degrees per sample. For example a 250 Hz @ 1000 samp/sec would be 1/4 of a stune per sample so 0x40. 
- *  The FREQUENCY_BAM16_PER_SAMPLE macros is availabel to make these conversions at run or compile time.
+ *  The FREQUENCY_BAM16_PER_SAMPLE macros is available to make these conversions at run or compile time.
  */
  
 typedef uint8_t BAM8;
@@ -207,11 +207,10 @@ Polar16 CORDIC16_rect2polar( Complex16 vector );
 #define CORDIC16_sincos(A) (CORDIC16_rotate( A, {Q15_ONE, 0}))
 
 // Frequenct Detection and Fourier Transforms
-Q_15 powerMeasurement( const Q_15* src, BAM16 freq, BAM16 phase, int N);
+Q_15 powerMeasurement_inphase( const Q_15* src, BAM16 freq, BAM8 phase, int N);
 Q_15 powerMeasurement_magnitude( const Q_15* src, BAM16 freq, int N);
 
-void FFT_inphase( Q_15* dst, const Q_15* src, int order );
-void FFT_quad( Q_15* dst, const Q_15* src, int order );
+void FFT_inphase( Q_15* dst, const Q_15* src, int order, BAM8 phase );
 void FFT_magnitude( Q_15* dst, const Q_15* src, int order );
 
 void Complex_FFT( Complex16* dst, Complex16* src, int order );
