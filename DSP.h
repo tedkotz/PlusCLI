@@ -56,7 +56,12 @@ extern "C" {
  *  https://en.wikipedia.org/wiki/Binary_angular_measurement
  *  
  *  This type is unsigned so as to take advantage of the defined wrapping behaviour of unsinged integer types in C.
+ *  
+ *  Real frequencies are represented in ratios as BAM16 degrees per sample. For example a 250 Hz @ 1000 samp/sec would be 1/4 of a stune per sample so 0x40. 
+ *  The FREQUENCY_BAM16_PER_SAMPLE macros is availabel to make these conversions at run or compile time.
  */
+ 
+typedef uint8_t BAM8;
 typedef uint16_t BAM16;
 //typedef uint32_t BAM32;
 
@@ -152,7 +157,11 @@ static const BAM16 BAM16_30_DEGREES  = 0x8003/6;  //BAM16_90_DEGREES/3+0.5
 #define COSINE_TABLE_SIZE 256
 
 /* Functions *****************************************************************/
-#define DEG2BAM16(X)  ((BAM16)(((X)*0x10000)/360))
+#define DEG2BAM16(X)     ((BAM16)(((X)*0x10000)/360))
+#define BAM8toBAM16(X)   ((BAM16)((X)<<8))
+#define BAM16toBAM8(X)   ((BAM8)((X)>>8))
+//#define BAM16toBAM32(X)  ((BAM32)((X)<<16))
+//#define BAM32toBAM16(X)  ((BAM16)((X)>>16))
 #define Q15_mult(A,B) ((((int32_t)(A))*((int32_t)(B)))>>15)
 
 #define FREQUENCY_BAM16_PER_SAMPLE( HZ, SAMPLE_RATE ) ((BAM16)(((uint32_t)(HZ) << 16)/(SAMPLE_RATE)))
@@ -184,13 +193,9 @@ int32_t UQ16_mult ( int32_t a, int32_t b );
 Q16_15 Q15_mac ( Q_15* a, Q_15* b , size_t count);
 UQ16_16 UQ16_mac ( UQ_16* a, UQ_16* b , size_t count);
 Q15_DIVMOD_t Q15_divmod ( Q16_15 a, Q_15 b);
-void FFT_inphase( Q_15* dst, const Q_15* src, int order );
-void FFT_quad( Q_15* dst, const Q_15* src, int order );
-void IFFT( Q_15* dst, Q_15* src, int order );
-void Complex_FFT( Complex16* dst, Complex16* src, int order );
-void Complex_FFT( Complex16* dst, Complex16* src, int order );
 
-Q_15 cosine_table( uint8_t x );
+
+Q_15 cosine_table( BAM8 x );
 
 
 // CORDIC
@@ -201,15 +206,28 @@ Polar16 CORDIC16_rect2polar( Complex16 vector );
 //SINCOS16_t CORDIC16_sincos( BAM16 angle );
 #define CORDIC16_sincos(A) (CORDIC16_rotate( A, {Q15_ONE, 0}))
 
-// COSINE
-// FFT-real
-// FFT-complex
+// Frequenct Detection and Fourier Transforms
+Q_15 powerMeasurement( const Q_15* src, BAM16 freq, BAM16 phase, int N);
+Q_15 powerMeasurement_magnitude( const Q_15* src, BAM16 freq, int N);
+
+void FFT_inphase( Q_15* dst, const Q_15* src, int order );
+void FFT_quad( Q_15* dst, const Q_15* src, int order );
+void FFT_magnitude( Q_15* dst, const Q_15* src, int order );
+
+void Complex_FFT( Complex16* dst, Complex16* src, int order );
+void Complex_IFT( Complex16* dst, Complex16* src, int order );
+
+void Real2Complex_FFT( Complex16* dst, Q_15* src, int order );
+void Complex2Real_IFT( Q_15* dst, Complex16* src, int order );
+
+
+// Filters
 // LPF
 // HPF
 // BPF
-// MAC
 
-
+// Define Filter
+// Apply Filter 
 
 
 
@@ -220,15 +238,3 @@ Polar16 CORDIC16_rect2polar( Complex16 vector );
 #endif
 
 #endif // DSP_H
-
-
-// binary degrees/radians
-// Q15
-// CORDIC
-// COSINE
-// FFT-real
-// FFT-complex
-// LPF
-// HPF
-// BPF
-// MAC

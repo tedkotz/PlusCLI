@@ -169,6 +169,10 @@ int DSP2_main (int argc, char** argv)
   FFT_quad( output, input, 5);
   bargraph( output, 32);
 
+  puts(F("Magnitude\n"));
+  FFT_magnitude( output, input, 5);
+  bargraph( output, 32);
+  
   return 0;  
 }
 
