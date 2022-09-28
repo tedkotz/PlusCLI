@@ -3,6 +3,7 @@
 #include "DSP.h"
 #include "conio.h"
 #include "mineswp.h"
+#include "samples.h"
 #include <limits.h>
 
 int monitor_main (int argc, char** argv);
@@ -189,13 +190,51 @@ int hw_main (int argc, char** argv)
 }
 
 #define ADC_PIN A0
+#define TONE_OUT 8
+#define ADC_NUM_SAMPLES_ORDER 6
+#define ADC_NUM_SAMPLES (1 << ADC_NUM_SAMPLES_ORDER)
+SampleBuffer adcSB;
+
+void adc_intterupt (void)
+{
+  SampleBuffer_push(&adcSB, (analogRead(ADC_PIN) - 0x200) << 6);
+}
 
 int adc_main (int argc, char** argv)
 {
+  Q_15 input[ADC_NUM_SAMPLES];
+  Q_15 output[ADC_NUM_SAMPLES];
+
+  int freqT=440;
+
+  if( argc > 1 )
+  {
+    freqT=atoi(argv[1]);
+  }
+
+  freqT = constrain(freqT, 200, 4000);
+
+  //setup 
+  pinMode( ADC_PIN, INPUT ); 
+  //SampleBuffer_init( &adcSB ); 
+
+  tone(TONE_OUT, freqT);
+
+  //loop
   while( !kbhit() )
   {
-    printf(F("Hello World\n"));
+    // Get enough samples to do forier analysis
+    getSamples(ADC_PIN, input, ADC_NUM_SAMPLES, PERIOD_US_5KHZ );
+
+    // Forward Fourier Transform
+    FFT_magnitude( output, input, ADC_NUM_SAMPLES_ORDER);
+
+    // Display results
+    clrscr();
+    bargraph( output, ADC_NUM_SAMPLES);
   }
+  
+  noTone(TONE_OUT);
   
   return 0;
 }
