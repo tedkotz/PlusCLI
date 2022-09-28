@@ -238,6 +238,37 @@ extern "C" Polar16 CORDIC16_rect2polar( Complex16 vector )
 
 }
 
+Q16_15 powerMeasurement_inphase( const Q_15* src, BAM16 freq, BAM16 phase, int N)
+{
+  Q16_15 sum = 0;
+  BAM16 angle=phase;
+  for( int j=0; j<N; ++j)
+  {
+    SINCOS16_t tmp=CORDIC16_sincos( angle );
+    sum += ((Q16_15)tmp.cos * (Q16_15)(*src++))>>8;
+    angle+=freq;
+  }
+  return (sum + (1 << 6)) >> 7;
+}
+
+Q16_15 powerMeasurement_magnitude( const Q_15* src, BAM16 freq, int N)
+{
+  Q16_15 sumI = 0;
+  Q16_15 sumQ = 0;
+  BAM16 angle=0;
+  for( int j=0; j<N; ++j)
+  {
+    SINCOS16_t tmp=CORDIC16_sincos( angle );
+    sumI += ((Q16_15)tmp.cos * (Q16_15)(*src++))>>8;
+    sumQ -= ((Q16_15)tmp.sin * (Q16_15)(*src++))>>8;
+    angle+=freq;
+  }
+  sumI = (sumI + (1 << 6)) >> 7;
+  sumQ = (sumQ + (1 << 6)) >> 7;
+  return sqrt(sumQ*sumQ + sumI*sumI);  
+}
+
+
 // Minimum = 0
 // Step = SAMPLE_RATE * 2^(-order)
 // Maximum = SAMPLE_RATE/2

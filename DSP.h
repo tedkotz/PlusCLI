@@ -207,8 +207,8 @@ Polar16 CORDIC16_rect2polar( Complex16 vector );
 #define CORDIC16_sincos(A) (CORDIC16_rotate( A, {Q15_ONE, 0}))
 
 // Frequenct Detection and Fourier Transforms
-Q_15 powerMeasurement_inphase( const Q_15* src, BAM16 freq, BAM8 phase, int N);
-Q_15 powerMeasurement_magnitude( const Q_15* src, BAM16 freq, int N);
+Q16_15 powerMeasurement_inphase( const Q_15* src, BAM16 freq, BAM16 phase, int N);
+Q16_15 powerMeasurement_magnitude( const Q_15* src, BAM16 freq, int N);
 
 void FFT_inphase( Q_15* dst, const Q_15* src, int order, BAM8 phase );
 void FFT_magnitude( Q_15* dst, const Q_15* src, int order );

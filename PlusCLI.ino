@@ -178,6 +178,28 @@ int DSP2_main (int argc, char** argv)
   return 0;  
 }
 
+int hw_main (int argc, char** argv)
+{
+  while( !kbhit() )
+  {
+    printf(F("Hello World\n"));
+  }
+  
+  return 0;
+}
+
+#define ADC_PIN A0
+
+int adc_main (int argc, char** argv)
+{
+  while( !kbhit() )
+  {
+    printf(F("Hello World\n"));
+  }
+  
+  return 0;
+}
+
 const CLI_CommandEntry commandEntryTable[] =
 {
   { "BLINK"   , blink           },
@@ -189,6 +211,8 @@ const CLI_CommandEntry commandEntryTable[] =
   { "DSP"     , DSP_main        },
   { "FFT"     , DSP2_main       },
   { "MONITOR" , monitor_main    },
+  { "ADC"     , adc_main        },
+  { "HW"      , hw_main         },
 };
 
 const char* getPrompt (void)
