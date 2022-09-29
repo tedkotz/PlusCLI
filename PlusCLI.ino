@@ -1,3 +1,14 @@
+/**
+ * @file    PlusCLI.ino
+ * @author  Ted Kotz <ted@kotz.us>
+ * @version 0.1
+ *
+ * [Description]
+ *
+ */
+
+
+/* Includes ******************************************************************/
 #include <Arduino.h>
 #include "CLI.h"
 #include "DSP.h"
@@ -6,21 +17,75 @@
 #include "samples.h"
 #include <limits.h>
 
+/* Defines *******************************************************************/
+/* Types *********************************************************************/
+/* Interfaces ****************************************************************/
+/**
+ * [Description]
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int monitor_main (int argc, char** argv);
 
+/* Data **********************************************************************/
+/* Functions *****************************************************************/
+
+/**
+ * Simple example starting place main callback. 
+ * A good example to copy to start.
+ * 
+ * look for the commandEntryTable to see how this function is included.
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
+int hw_main (int argc, char** argv)
+{
+  while( !kbhit() )
+  {
+    printf(F("Hello World\n"));
+  }
+  
+  return 0;
+}
+
+/**
+ * Classic arduino blink sketch mofied to CLI command
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int blink (int argc, char** argv)
 {
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(500);                        // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(500);                        // wait for a second
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(500);                        // wait for a second
+  // Setup 
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  // Loop
+  while( !kbhit() )
+  {
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    delay(1000);                       // wait for a second
+    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    delay(1000);                       // wait for a second
+  }
+
+  // Cleanup
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
 
   return SUCCESS;
 }
 
+/**
+ * [Description]
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int echo (int argc, char** argv)
 {
   int x, y;
@@ -33,6 +98,13 @@ int echo (int argc, char** argv)
   return SUCCESS;
 }
 
+/**
+ * [Description]
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int bgcolor (int argc, char** argv)
 {
   if( argc < 2 )
@@ -48,6 +120,13 @@ int bgcolor (int argc, char** argv)
   return SUCCESS;
 }
 
+/**
+ * [Description]
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int fgcolor (int argc, char** argv)
 {
   if( argc < 2 )
@@ -62,6 +141,13 @@ int fgcolor (int argc, char** argv)
   return SUCCESS;
 }
 
+/**
+ * [Description]
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int seedrand (int argc, char** argv)
 {
   if( argc < 2 )
@@ -84,7 +170,13 @@ int seedrand (int argc, char** argv)
   return SUCCESS;
 }
 
-
+/**
+ * [Description]
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int DSP_main (int argc, char** argv)
 {
   SINCOS16_t tmp;
@@ -110,6 +202,12 @@ int DSP_main (int argc, char** argv)
   return 2;
 }
 
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 void bargraph( const Q_15* data, int N)
 {
   while( N-- )
@@ -125,6 +223,13 @@ void bargraph( const Q_15* data, int N)
   putch('\n');
 }
 
+/**
+ * [Description]
+ *
+ * @param argc number of arguments
+ * @param argv a list of string arguments
+ * @return Error Code, 0 means success
+ */
 int DSP2_main (int argc, char** argv)
 {
   SINCOS16_t tmp;
@@ -179,16 +284,6 @@ int DSP2_main (int argc, char** argv)
   return 0;  
 }
 
-int hw_main (int argc, char** argv)
-{
-  while( !kbhit() )
-  {
-    printf(F("Hello World\n"));
-  }
-  
-  return 0;
-}
-
 #define ADC_PIN A0
 #define TONE_OUT 8
 #define ADC_NUM_SAMPLES_ORDER 6
@@ -239,21 +334,12 @@ int adc_main (int argc, char** argv)
   return 0;
 }
 
-const CLI_CommandEntry commandEntryTable[] =
-{
-  { "BLINK"   , blink           },
-  { "ECHO"    , echo            },
-  { "BGCOLOR" , bgcolor         },
-  { "FGCOLOR" , fgcolor         },
-  { "SEED"    , seedrand        },
-  { "GAME"    , minesweep_main  },
-  { "DSP"     , DSP_main        },
-  { "FFT"     , DSP2_main       },
-  { "MONITOR" , monitor_main    },
-  { "ADC"     , adc_main        },
-  { "HW"      , hw_main         },
-};
-
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 const char* getPrompt (void)
 {
   static char prompt[32];
@@ -262,9 +348,29 @@ const char* getPrompt (void)
   return prompt;
 }
 
-
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 void setup()
 {
+  const CLI_CommandEntry commandEntryTable[] =
+  {
+    { "BLINK"   , blink           },
+    { "ECHO"    , echo            },
+    { "BGCOLOR" , bgcolor         },
+    { "FGCOLOR" , fgcolor         },
+    { "SEED"    , seedrand        },
+    { "GAME"    , minesweep_main  },
+    { "DSP"     , DSP_main        },
+    { "FFT"     , DSP2_main       },
+    { "MONITOR" , monitor_main    },
+    { "ADC"     , adc_main        },
+    { "HW"      , hw_main         },
+  };
+
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.setTimeout(LONG_MAX);
@@ -274,6 +380,12 @@ void setup()
   CLI_getPrompt = getPrompt;
 }
 
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 void loop()
 {
   CLI_loop();

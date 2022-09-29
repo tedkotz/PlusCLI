@@ -1,7 +1,22 @@
+/**
+ * @file    conio.h
+ * @author  Ted Kotz <ted@kotz.us>
+ * @version 0.1
+ *
+ * A Console I/O interface declaration targeting compatibility with similar
+ * functionality from older DOS Borland tools. 
+ * 
+ * This libabry is implemented over serial I/O relying on ANSI terminal escape sequences
+ *
+ */
+#ifndef   CONIO_H
+#define   CONIO_H
 
+/* Includes ******************************************************************/
 #include <Arduino.h>
 #include <stdio.h>
 
+/* Defines *******************************************************************/
 #undef putchar
 #define putchar   CONIO_putchar
 #define puts      CONIO_puts
@@ -32,47 +47,6 @@
 #define _NOCURSOR      0
 #define _NORMALCURSOR  20
 #define _SOLIDCURSOR   100
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int CONIO_putchar( int  c);
-int CONIO_puts( const char * str);
-int CONIO_vprintf( const char * format, va_list args);
-int CONIO_printf( const char * format, ...);
-int getch(void);
-int getche(void);
-int CONIO_getchar(void);
-size_t read_until(char* str, size_t n, int until);
-char* gets_s(char* str, size_t n);
-char* CONIO_gets(char* str);
-int vscanf(const char *format, va_list args);
-int CONIO_scanf( const char * format, ...);
-void clrscr(void);
-void delline(void);
-void textattr(int attr);
-void textcolor(int color);
-void textbackground(int color);
-void textblink(int blink);
-int kbhit(void);
-void gotoxy(int x, int y);
-
-void clreol (void);
-
-void whereCursor( int* x, int* y);
-int wherex(void);
-int wherey(void);
-
-int  cputsxy (int x, int y, const char* str);
-int  putchxy (int x, int y, int ch);
-
-void  _setcursortype (int type);
-void  normvideo (void);
-
-int ungetch (int);
-void clearkeybuf (void);
-
 
 // COLORS
 
@@ -113,17 +87,332 @@ void clearkeybuf (void);
 #define WHITE            15
 
 
+/* Types *********************************************************************/
+/* Interfaces ****************************************************************/
+/* Data **********************************************************************/
+/* Functions *****************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int CONIO_putchar( int  c);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int CONIO_puts( const char * str);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int CONIO_vprintf( const char * format, va_list args);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int CONIO_printf( const char * format, ...);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int getch(void);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int getche(void);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int CONIO_getchar(void);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+size_t read_until(char* str, size_t n, int until);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+char* gets_s(char* str, size_t n);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+char* CONIO_gets(char* str);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int vscanf(const char *format, va_list args);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int CONIO_scanf( const char * format, ...);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void clrscr(void);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void delline(void);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void textattr(int attr);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void textcolor(int color);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void textbackground(int color);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void textblink(int blink);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int kbhit(void);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void gotoxy(int x, int y);
+
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void clreol (void);
+
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void whereCursor( int* x, int* y);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int wherex(void);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int wherey(void);
+
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int  cputsxy (int x, int y, const char* str);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int  putchxy (int x, int y, int ch);
+
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void  _setcursortype (int type);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void  normvideo (void);
+
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+int ungetch (int);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
+void clearkeybuf (void);
+
+
 #ifdef  __cplusplus
 }
 
 // C++ functions to allow use of FlashStrings
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int CONIO_puts( const __FlashStringHelper* str);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int CONIO_vprintf( const __FlashStringHelper* format, va_list args);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int CONIO_printf( const __FlashStringHelper* format, ...);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int vscanf(const __FlashStringHelper* format, va_list args);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int vsscanf(const char *str, const __FlashStringHelper* format, va_list args);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int sscanf( const char *str, const __FlashStringHelper* format, ...);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int CONIO_scanf( const __FlashStringHelper* format, ...);
+
+/**
+ * [Description]
+ *
+ * @param
+ * @return
+ */
 int cputsxy (int x, int y, const __FlashStringHelper* str);
 
 #endif
+
+
+#endif // CONIO_H

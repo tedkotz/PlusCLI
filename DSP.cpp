@@ -1,5 +1,5 @@
 /**
- * @file    [FileName.c]
+ * @file    DSP.cpp
  * @author  Ted Kotz <ted@kotz.us>
  * @version 0.1
  *

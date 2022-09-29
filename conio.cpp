@@ -1,10 +1,30 @@
+/**
+ * @file    conio.cpp
+ * @author  Ted Kotz <ted@kotz.us>
+ * @version 0.1
+ *
+ * [Description]
+ *
+ */
 
+
+/* Includes ******************************************************************/
 #include "conio.h"
 
 #include <stdarg.h>
 
+/* Defines *******************************************************************/
 #define SCAN_BUFFER_SIZE 128
 
+
+/* Types *********************************************************************/
+/* Interfaces ****************************************************************/
+/* Data **********************************************************************/
+#define EMPTY_UNGETCHAR -1
+static int ungetchar = EMPTY_UNGETCHAR;
+
+
+/* Functions *****************************************************************/
 
 extern "C" int CONIO_putchar( int  c)
 {
@@ -93,9 +113,6 @@ int CONIO_printf( const __FlashStringHelper* format, ...)
   va_end(arg_ptr);
   return returnVal;
 }
-
-#define EMPTY_UNGETCHAR -1
-static int ungetchar = EMPTY_UNGETCHAR;
 
 extern "C" int ungetch (int c)
 {
