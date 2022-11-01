@@ -1,0 +1,9 @@
+[submodule "libraries/simpleCLI"]
+	path = libraries/simpleCLI
+	url = https://github.com/tedkotz/simpleCLI.git
+[submodule "libraries/fpDSP"]
+	path = libraries/fpDSP
+	url = https://github.com/tedkotz/fpDSP.git
+[submodule "libraries/CONduinIO"]
+	path = libraries/CONduinIO
+	url = https://github.com/tedkotz/CONduinIO.git
