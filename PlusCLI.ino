@@ -241,7 +241,7 @@ int DSP2_main (int argc, char** argv)
 
   puts(F("building signal\n"));
   angle = 0;
-  dAngle = FREQUENCY_BAM16_PER_SAMPLE(128,1024);
+  dAngle = FREQUENCY_HZtoBAM16_PER_SAMPLE(128,1024);
   for( int i=0; i<32; ++i)
   {
     tmp = CORDIC16_sincos(angle);
@@ -250,7 +250,7 @@ int DSP2_main (int argc, char** argv)
   }
 
   angle = BAM16_45_DEGREES;
-  dAngle = FREQUENCY_BAM16_PER_SAMPLE(192,1024);
+  dAngle = FREQUENCY_HZtoBAM16_PER_SAMPLE(192,1024);
   for( int i=0; i<32; ++i)
   {
     tmp = CORDIC16_sincos(angle);
@@ -259,7 +259,7 @@ int DSP2_main (int argc, char** argv)
   }
 
   angle = 0;
-  dAngle = FREQUENCY_BAM16_PER_SAMPLE(288,1024);
+  dAngle = FREQUENCY_HZtoBAM16_PER_SAMPLE(288,1024);
   for( int i=0; i<32; ++i)
   {
     tmp = CORDIC16_sincos(angle);
